@@ -30,6 +30,16 @@ const Navbar = ({ click }) => {
                     <Link to="/">Shop</Link>
                 </li>
                 {/* Checkout link removed as requested */}
+                {userInfo && (
+                    <>
+                        <li>
+                            <Link to="/account">My Account</Link>
+                        </li>
+                        <li>
+                            <Link to="/orders">My Orders</Link>
+                        </li>
+                    </>
+                )}
                 <li>
                     {userInfo ? (
                         <button onClick={() => dispatch(logout())} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}>Logout</button>

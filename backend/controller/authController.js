@@ -79,4 +79,40 @@ exports.profile = async (req, res) => {
   }
 };
 
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    if (email && email !== user.email) {
+      const existing = await User.findOne({ email });
+      if (existing && String(existing._id) !== String(user._id)) {
+        return res.status(409).json({ message: 'Email already in use' });
+      }
+      user.email = email;
+    }
+    if (name) user.name = name;
+    if (password) user.password = password;
+
+    await user.save();
+
+    return res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      token: jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'dev_secret', { expiresIn: '7d' }),
+    });
+  } catch (error) {
+    if (error && error.name === 'ValidationError') {
+      const pwErr = error.errors?.password;
+      if (pwErr && pwErr.kind === 'minlength') {
+        return res.status(400).json({ message: 'Password must be at least 6 characters' });
+      }
+    }
+    console.error(error);
+    return res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 

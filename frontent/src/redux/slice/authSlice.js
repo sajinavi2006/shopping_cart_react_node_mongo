@@ -35,6 +35,24 @@ export const registerThunk = createAsyncThunk(
   }
 );
 
+export const updateProfileThunk = createAsyncThunk(
+  'auth/updateProfile',
+  async ({ name, email, password }, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.userInfo?.token;
+      const response = await axios.put('/api/auth/me', { name, email, password }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = response.data;
+      localStorage.setItem('userInfo', JSON.stringify(data));
+      return data;
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Update failed';
+      return rejectWithValue(message);
+    }
+  }
+);
+
 const initialState = {
   userInfo: userInfoFromStorage,
   loading: false,
@@ -75,6 +93,18 @@ const authSlice = createSlice({
       .addCase(registerThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Registration failed';
+      })
+      .addCase(updateProfileThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfileThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userInfo = action.payload;
+      })
+      .addCase(updateProfileThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Update failed';
       });
   },
 });
