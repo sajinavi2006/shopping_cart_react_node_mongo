@@ -8,6 +8,7 @@ import { addToCartThunk, removeToCartThunk } from '../redux/slice/cartSlice';
 const CartScreen = () => {
     const dispatch = useDispatch()
     const { cartItems } = useSelector(state => state.cart)
+    const { userInfo } = useSelector(state => state.auth)
     const navigate = useNavigate();
 
     const qtyChangeHandler = (addCartId, qty) => {
@@ -64,7 +65,13 @@ const CartScreen = () => {
                     <p>${getCartSubTotal()}</p>
                 </div>
                 <div>
-                    <button onClick={() => navigate('/checkout')}>Proceed To Checkout</button>
+                    <button onClick={() => {
+                        if (userInfo) {
+                            navigate('/checkout');
+                        } else {
+                            navigate('/login', { state: { from: '/checkout' } });
+                        }
+                    }}>Proceed To Checkout</button>
                 </div>
             </div>
         </div >

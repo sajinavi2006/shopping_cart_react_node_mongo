@@ -1,10 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginThunk, registerThunk } from '../redux/slice/authSlice';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export default function LoginScreen() {
   const dispatch = useDispatch();
   const { loading, error, userInfo } = useSelector((s) => s.auth);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from || '/';
   const [isRegister, setIsRegister] = useState(false);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -18,6 +22,12 @@ export default function LoginScreen() {
       dispatch(loginThunk({ email, password }));
     }
   };
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate(redirectTo, { replace: true });
+    }
+  }, [userInfo, navigate, redirectTo]);
 
   return (
     <div style={{ maxWidth: 400, margin: '2rem auto' }}>

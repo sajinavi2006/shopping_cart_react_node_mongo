@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { saveShippingAddress, saveBillingAddress, setSameAsShipping } from '../redux/slice/checkoutSlice';
+import { clearCart } from '../redux/slice/cartSlice';
 
 export default function CheckoutScreen() {
   const dispatch = useDispatch();
   const { shippingAddress, billingAddress, sameAsShipping } = useSelector((s) => s.checkout);
+  const { cartItems } = useSelector((s) => s.cart);
+  const { userInfo } = useSelector((s) => s.auth);
+  const navigate = useNavigate();
 
   const [ship, setShip] = useState(shippingAddress);
   const [bill, setBill] = useState(billingAddress);
@@ -12,16 +18,45 @@ export default function CheckoutScreen() {
 
   useEffect(() => {
     setBill(same ? ship : billingAddress);
-  }, [same, ship]);
+  }, [same, ship, billingAddress]);
 
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
     dispatch(saveShippingAddress(ship));
     dispatch(setSameAsShipping(same));
     if (!same) {
       dispatch(saveBillingAddress(bill));
     }
-    alert('Details saved');
+
+    try {
+      if (!userInfo?.token) {
+        navigate('/login', { state: { from: '/checkout' } });
+        return;
+      }
+
+      const payload = {
+        shippingAddress: ship,
+        billingAddress: same ? ship : bill,
+        sameAsShipping: same,
+        items: cartItems.map((it) => ({
+          product: it.product,
+          name: it.name,
+          imageUrl: it.imageUrl,
+          price: it.price,
+          qty: it.qty,
+        })),
+      };
+
+      await axios.post('/api/orders', payload, {
+        headers: { Authorization: `Bearer ${userInfo.token}` },
+      });
+
+      dispatch(clearCart());
+      navigate('/order-success', { replace: true });
+    } catch (err) {
+      const message = err.response?.data?.message || err.message || 'Failed to place order';
+      alert(message);
+    }
   }
 
   const autoCompleteFor = (section, key) => {

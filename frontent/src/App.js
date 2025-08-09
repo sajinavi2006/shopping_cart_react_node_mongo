@@ -19,6 +19,7 @@ import CartScreen from "./screens/CartScreen";
 import DemoScreen from './screens/DemoScreen';
 import LoginScreen from './screens/LoginScreen';
 import CheckoutScreen from './screens/CheckoutScreen';
+import OrderSuccess from './screens/OrderSuccess';
 // import DemoScreen2 from './screens/DemoScreen2';
 // import InputScreen from "./screens/InputScreen";
 
@@ -39,6 +40,7 @@ function App() {
           <Route path="cart" element={<CartScreen />} />
           <Route path="login" element={<LoginScreen />} />
           <Route path="checkout" element={<CheckoutScreen />} />
+          <Route path="order-success" element={<OrderSuccess />} />
           <Route path="demo" element={<DemoScreen />} />
           {/* <Route path="demo2" element={<DemoScreen2 />} />
           <Route path="input" element={<InputScreen />} /> */}

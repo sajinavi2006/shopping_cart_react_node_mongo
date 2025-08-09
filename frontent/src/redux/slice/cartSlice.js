@@ -44,8 +44,11 @@ export const removeToCartThunk = createAsyncThunk(
 export const AddToCartSlice = createSlice({
     name: 'CartProduct',
     initialState: CART_INITIAL_STATE,
-    reducer: {
-
+    reducers: {
+        clearCart(state) {
+            state.cartItems = []
+            try { localStorage.removeItem('cart') } catch (e) {}
+        }
     },
     extraReducers: {
         [addToCartThunk.pending]: (state) => {
@@ -81,6 +84,6 @@ export const AddToCartSlice = createSlice({
     }
 })
 
-// export const { ADD_TO_CART, REMOVE_FROM_CART } = cartSlice.actions
+export const { clearCart } = AddToCartSlice.actions
 const cartReducer = AddToCartSlice.reducer
 export default cartReducer;

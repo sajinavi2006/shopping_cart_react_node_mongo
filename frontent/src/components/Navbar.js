@@ -14,7 +14,7 @@ const Navbar = ({ click }) => {
         <div className='navbar'>
             <div className='navbar__logo'>
                 <Link to="/">
-                    <h2>Shop for     life easy</h2>
+                    <h2>My Shop</h2>
                 </Link>
             </div>
             <ul className="navbar__links">
@@ -29,9 +29,7 @@ const Navbar = ({ click }) => {
                 <li>
                     <Link to="/">Shop</Link>
                 </li>
-                <li>
-                    <Link to="/checkout">Checkout</Link>
-                </li>
+                {/* Checkout link removed as requested */}
                 <li>
                     {userInfo ? (
                         <button onClick={() => dispatch(logout())} style={{ background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}>Logout</button>
